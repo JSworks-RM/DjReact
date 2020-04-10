@@ -1,7 +1,7 @@
 {
-  "python.pythonPath": "D:\\Program Files\\Microsoft SQL Server\\150\\PYTHON_SERVER\\python.exe",
-  "editor.formatOnSave": true,
-  "python.linting.pycodestyleEnabled": true,
+  //"python.pythonPath": "D:\\Users\\Nienke\\AppData\\Local\\Programs\\Python\\Python38-32\\python.exe",
+  //"editor.formatOnSave": true,
+  //"python.linting.pycodestyleEnabled": true,
   "python.linting.pylintPath": "pylint",
   "python.linting.pylintArgs": ["--load-plugins", "pylint_django"],
   "python.linting.pylintEnabled": true,
@@ -9,5 +9,6 @@
   "python.linting.pycodestyleArgs": ["--ignore=E501"],
   "files.exclude": {
     "**/*.pyc": true
-  }
+  },
+  "python.pythonPath": "D:\\Program Files\\Microsoft SQL Server\\150\\PYTHON_SERVER\\python.exe"
 }
