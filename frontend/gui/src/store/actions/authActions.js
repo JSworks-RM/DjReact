@@ -6,6 +6,7 @@ import {
   AUTH_LOGOUT,
 } from "./actionTypes";
 
+/* ********************** ACTION CREATORS ********************** */
 export const authStart = () => {
   return {
     type: AUTH_START,
@@ -27,8 +28,8 @@ export const authFail = (error) => {
 };
 
 export const logout = () => {
-  localStorage.remove("user");
-  localStorage.remove("expirationDate");
+  localStorage.removeItem("user");
+  localStorage.removeItem("expirationDate");
   return {
     type: AUTH_LOGOUT,
   };
@@ -52,7 +53,7 @@ export const authLogin = (username, password) => {
       })
       .then((res) => {
         const token = res.data.key;
-        expirationDate = new Date(new Date().getDate() + 3600 * 1000);
+        const expirationDate = new Date(new Date().getDate() + 3600 * 1000);
         localStorage.setItem("token", token);
         localStorage.setItem("expirationDate", expirationDate);
         dispatch(authSuccess(token));
@@ -76,7 +77,7 @@ export const authSignup = (username, email, password1, password2) => {
       })
       .then((res) => {
         const token = res.data.key;
-        expirationDate = new Date(new Date().getDate() + 3600 * 1000);
+        const expirationDate = new Date(new Date().getDate() + 3600 * 1000);
         localStorage.setItem("token", token);
         localStorage.setItem("expirationDate", expirationDate);
         dispatch(authSuccess(token));
@@ -85,5 +86,26 @@ export const authSignup = (username, email, password1, password2) => {
       .catch((error) => {
         dispatch(authFail(error));
       });
+  };
+};
+
+export const autoCheckState = () => {
+  return (dispatch) => {
+    const token = localStorage.getItem("token");
+    if (token === null) {
+      dispatch(logout());
+    } else {
+      const expirationDate = new Date(localStorage.getItem("expirationDate"));
+      if (expirationDate <= new Date()) {
+        dispatch(logout());
+      } else {
+        dispatch(authSuccess(token));
+        dispatch(
+          checkAuthTimeOut(
+            (expirationDate.getTime() - new Date().getTime) / 1000
+          )
+        );
+      }
+    }
   };
 };

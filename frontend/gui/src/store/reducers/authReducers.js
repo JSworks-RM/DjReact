@@ -41,7 +41,9 @@ const authLogout = (state, action) => {
   });
 };
 
-// The reducer where this action take place
+/* ********************** REDUCER ********************** */
+// The reducer where this action take place when a dispatch occurs.
+// Receive the state and the action
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case AUTH_START:
