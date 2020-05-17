@@ -4,13 +4,13 @@ import BaseRouter from "./routes";
 import "antd/dist/antd.css";
 import { connect } from "react-redux";
 
-import { autoCheckState } from "./store/actions/authActions";
+import { authCheckState } from "./store/actions/authActions";
 import CustomLayout from "./containers/Layout";
 
 class App extends Component {
-  componentDidMount = () => {
+  componentDidMount() {
     this.props.onTryAutoSignup();
-  };
+  }
 
   render() {
     return (
@@ -33,7 +33,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onTryAutoSignup: () => dispatch(autoCheckState()),
+    onTryAutoSignup: () => dispatch(authCheckState()),
   };
 };
 

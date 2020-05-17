@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Redirect } from "react-router-dom";
 import { Form, Input, Button, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { connect } from "react-redux";
@@ -10,29 +10,40 @@ class LoginForm extends Component {
     super(props);
 
     this.onFinish = this.onFinish.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
+  state = {
+    username: "",
+    password: "",
+  };
+
+  handleChange = (e) => {
+    this.setState({ [e.target.name]: e.target.value });
+  };
+
   onFinish = (values) => {
-    console.log("Success:", values);
     this.props.onAuthLogin(values.username, values.password);
-    this.props.history.push("/");
+    this.setState({ username: values.username, password: values.password });
   };
 
   onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
+
   render() {
     // Spin
     const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-
-    let errorMessage = null;
-    if (this.props.error) {
-      errorMessage = <p>{this.props.error.message}</p>;
+    const { error, loading, token } = this.props;
+    const { username, password } = this.state;
+    if (token) {
+      return <Redirect to="/" />;
     }
+
     return (
       <div>
-        {errorMessage}
-        {this.props.loading ? (
+        {error && <p>{this.props.error.message}</p>}
+        {loading ? (
           <Spin indicator={antIcon} />
         ) : (
           <Form
@@ -41,7 +52,9 @@ class LoginForm extends Component {
             style={{ marginTop: "40px" }}
           >
             <Form.Item
+              onChange={this.handleChange}
               name="username"
+              value={username}
               rules={[
                 {
                   required: true,
@@ -53,7 +66,9 @@ class LoginForm extends Component {
             </Form.Item>
 
             <Form.Item
+              onChange={this.handleChange}
               name="password"
+              value={password}
               rules={[
                 {
                   required: true,
@@ -69,6 +84,8 @@ class LoginForm extends Component {
                 type="primary"
                 style={{ marginRight: "10px", marginTop: "10px" }}
                 htmlType="submit"
+                loading={loading}
+                disabled={loading}
               >
                 Login
               </Button>
@@ -84,10 +101,11 @@ class LoginForm extends Component {
   }
 }
 
-const mapStateToPtops = (state) => {
+const mapStateToProps = (state) => {
   return {
     loading: state.loading,
     error: state.error,
+    token: state.token,
   };
 };
 
@@ -98,4 +116,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(mapStateToPtops, mapDispatchToProps)(LoginForm);
+export default connect(mapStateToProps, mapDispatchToProps)(LoginForm);

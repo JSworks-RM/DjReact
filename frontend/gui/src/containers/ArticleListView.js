@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Articles from "../components/Article";
 import axios from "axios";
+import { connect } from "react-redux";
 
 import CustomForm from "../components/Form";
 
@@ -9,12 +10,22 @@ class ArticleList extends Component {
     articles: [],
   };
 
-  componentDidMount() {
+  fetchArticles = () => {
     axios.get("http://127.0.0.1:8000/api/").then((res) => {
       this.setState({
         articles: res.data,
       });
     });
+  };
+
+  componentDidMount() {
+    this.fetchArticles();
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.token) {
+      this.fetchArticles();
+    }
   }
 
   render() {
@@ -33,4 +44,9 @@ class ArticleList extends Component {
   }
 }
 
-export default ArticleList;
+const mapStateToProps = (state) => {
+  return {
+    token: state.token,
+  };
+};
+export default connect(mapStateToProps)(ArticleList);

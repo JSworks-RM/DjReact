@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Form, Input, Button } from "antd";
 
 import axios from "axios";
+import { connect } from "react-redux";
 
 class CustomForm extends Component {
   constructor(props) {
@@ -13,28 +14,42 @@ class CustomForm extends Component {
   handleFormSubmit = (value, requestType, articleID) => {
     const title = value.title;
     const content = value.content;
+    const postObj = {
+      title: title,
+      content: content,
+    };
+
+    if (this.props.token !== null) {
+      axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+      axios.defaults.xsrfCookieName = "csrftoken";
+      axios.defaults.headers = {
+        "Content-Type": "application/json",
+        Authorization: `Token ${this.props.token}`,
+      };
+    }
 
     switch (requestType) {
       case "post":
         return axios
-          .post("http://127.0.0.1:8000/api/", {
-            title: title,
-            content: content,
-          })
+          .post("http://127.0.0.1:8000/api/", postObj)
           .then((res) => {
-            console.log(res);
+            if (res.status === 201) {
+              console.log("Props", this.props);
+              //this.props.history.push(`/`);
+              window.location.href = "/";
+            }
           })
           .catch((error) => {
             console.log(error);
           });
       case "put":
         return axios
-          .put(`http://127.0.0.1:8000/api/${articleID}/`, {
-            title: title,
-            content: content,
-          })
+          .put(`http://127.0.0.1:8000/api/${articleID}/`, postObj)
           .then((res) => {
-            console.log(res);
+            if (res.status === 200) {
+              //this.props.history.push(`/`);
+              window.location.href = `/article/${articleID}`;
+            }
           })
           .catch((error) => {
             console.log(error);
@@ -74,4 +89,9 @@ class CustomForm extends Component {
   }
 }
 
-export default CustomForm;
+const mapStateToProps = (state) => {
+  return {
+    token: state.token,
+  };
+};
+export default connect(mapStateToProps)(CustomForm);

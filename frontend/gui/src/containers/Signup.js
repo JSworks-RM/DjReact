@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Form, Input, Button, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
-import { NavLink } from "react-router-dom";
+import { NavLink, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 import { authSignup } from "../store/actions/authActions";
 
@@ -11,32 +11,43 @@ class RegistrationForm extends Component {
 
     this.onFinish = this.onFinish.bind(this);
   }
+
+  state = {
+    username: "",
+    email: "",
+    password: "",
+    confirm: "",
+  };
+
+  handleChange = (e) => {
+    e.preventDefault();
+    this.setState({ [e.target.name]: [e.target.value] });
+  };
   onFinish = (values) => {
-    console.log("Received values of form: ", values);
-    this.props.onAuthSignup(
-      values.username,
-      values.email,
-      values.password,
-      values.confirm
-    );
+    this.setState(values); //values is an object with al values
+    const { username, email, password, confirm } = this.state;
+    this.props.onAuthSignup(username, email, password, confirm);
   };
 
   render() {
+    const { username, email, password, confirm } = this.state;
+    const { error, loading, token } = this.props;
     // Spin
     const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-
-    let errorMessage = null;
-    if (this.props.error) {
-      errorMessage = <p>{this.props.error.message}</p>;
+    if (token) {
+      return <Redirect to="/" />;
     }
+
     return (
       <div>
-        {errorMessage}
-        {this.props.loading ? (
+        {error && <p>{error.message}</p>}
+        {loading ? (
           <Spin indicator={antIcon} />
         ) : (
           <Form onFinish={this.onFinish}>
             <Form.Item
+              onChange={this.handleChange}
+              value={username}
               name="username"
               rules={[
                 {
@@ -49,8 +60,10 @@ class RegistrationForm extends Component {
             </Form.Item>
 
             <Form.Item
+              onChange={this.handleChange}
+              value={email}
               name="email"
-              placeholder="E-mail"
+              placeholder="E-mail address"
               rules={[
                 {
                   type: "email",
@@ -66,7 +79,11 @@ class RegistrationForm extends Component {
             </Form.Item>
 
             <Form.Item
+              onChange={this.handleChange}
+              value={password}
               name="password"
+              placeholder="Password"
+              type="password"
               rules={[
                 {
                   required: true,
@@ -79,6 +96,8 @@ class RegistrationForm extends Component {
             </Form.Item>
 
             <Form.Item
+              onChange={this.handleChange}
+              value={confirm}
               name="confirm"
               dependencies={["password"]}
               hasFeedback
@@ -100,7 +119,7 @@ class RegistrationForm extends Component {
               >
                 Signup
               </Button>
-              or
+              Already have an account?
               <NavLink style={{ marginLeft: "10px" }} to="/login/">
                 Login
               </NavLink>
@@ -112,7 +131,7 @@ class RegistrationForm extends Component {
   }
 }
 
-const mapStateToPtops = (state) => {
+const mapStateToProps = (state) => {
   return {
     loading: state.loading,
     error: state.error,
@@ -126,4 +145,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(mapStateToPtops, mapDispatchToProps)(RegistrationForm);
+export default connect(mapStateToProps, mapDispatchToProps)(RegistrationForm);
